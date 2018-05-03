@@ -1,0 +1,7 @@
+{
+  "proxyAddr": "0.0.0.0:19000",
+  "ConnNumber": 10,
+  "ReadTimeout": 1000,
+  "WriteTimeout": 1000,
+  "RedisAddrs":["192.168.10.150:7000","192.168.10.150:7001"]
+}
