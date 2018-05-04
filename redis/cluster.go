@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"math/rand"
 	"net"
 	"sync"
 	"sync/atomic"
 	"time"
-	"log"
 
 	"github.com/go-redis/redis/internal"
 	"github.com/go-redis/redis/internal/hashtag"
@@ -360,7 +360,7 @@ func (c *clusterNodes) All() ([]*clusterNode, error) {
 
 func (c *clusterNodes) Random() (*clusterNode, error) {
 	addrs, err := c.Addrs()
-	log.Printf("ClusterClient Random 363 addr %s\n",addrs)
+	log.Printf("ClusterClient Random 363 addr %s\n", addrs)
 	if err != nil {
 		return nil, err
 	}
@@ -427,7 +427,6 @@ func newClusterState(nodes *clusterNodes, slots []ClusterSlot, origin string) (*
 
 func (c *clusterState) slotMasterNode(slot int) (*clusterNode, error) {
 	nodes := c.slotNodes(slot)
-	log.Printf("ClusterClient slotMasterNode  429 %d\n",len(nodes))
 	if len(nodes) > 0 {
 		return nodes[0], nil
 	}
@@ -668,9 +667,7 @@ func (c *ClusterClient) cmdSlotAndNode(cmd Cmder) (int, *clusterNode, error) {
 
 	cmdInfo := c.cmdInfo(cmd.Name())
 	slot := cmdSlot(cmd, cmdFirstKeyPos(cmd, cmdInfo))
-	log.Printf("ClusterClient cmdSlotAndNode slot %d \n", slot)
 	if cmdInfo != nil && cmdInfo.ReadOnly && c.opt.ReadOnly {
-		log.Printf("ClusterClient cmdSlotAndNode slot 671 %d \n", slot)
 		if c.opt.RouteByLatency {
 			node, err := state.slotClosestNode(slot)
 			return slot, node, err
@@ -685,7 +682,6 @@ func (c *ClusterClient) cmdSlotAndNode(cmd Cmder) (int, *clusterNode, error) {
 		return slot, node, err
 	}
 	node, err := state.slotMasterNode(slot)
-	log.Printf("ClusterClient cmdSlotAndNode slot 685 %d node *p\n", slot, node)
 	return slot, node, err
 }
 
@@ -782,9 +778,7 @@ func (c *ClusterClient) defaultProcess(cmd Cmder) error {
 		if attempt > 0 {
 			time.Sleep(c.retryBackoff(attempt))
 		}
-		log.Printf("ClusterClient defaultProcess 775")
 		if node == nil {
-			log.Printf("ClusterClient defaultProcess 776 name %s", cmd.Name())
 			var err error
 			_, node, err = c.cmdSlotAndNode(cmd)
 			if err != nil {
@@ -1212,6 +1206,7 @@ func (c *ClusterClient) TxPipelined(fn func(Pipeliner) error) ([]Cmder, error) {
 }
 
 func (c *ClusterClient) defaultProcessTxPipeline(cmds []Cmder) error {
+	log.Println("defaultProcessTxPipeline 22222222222")
 	state, err := c.state.Get()
 	if err != nil {
 		return err

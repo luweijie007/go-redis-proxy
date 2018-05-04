@@ -40,7 +40,7 @@ func main() {
 		log.Fatalf("create proxy fail err [%s]\n", err.Error())
 	}
 	if err := proxy.Start(); err != nil {
-		log.Fatalf("Start proxy fail err [%s]\n", err.Error())
+		log.Fatalf("start proxy fail err [%s]\n", err.Error())
 	}
 
 	//singal quit

@@ -45,7 +45,7 @@ func NewReader(rd io.Reader) *Reader {
 	return &Reader{
 		src:    bufio.NewReader(rd),
 		buf:    make([]byte, 4096),
-		rawbuf: make([]byte, 4096),
+		rawbuf: make([]byte, 0, 1024),
 	}
 }
 
@@ -54,7 +54,7 @@ func (r *Reader) GetsrcBuf() *bufio.Reader {
 }
 
 func (r *Reader) ResetRawbuf() {
-	r.rawbuf = make([]byte, 1024)
+	r.rawbuf = make([]byte, 0, 1024)
 }
 
 func (r *Reader) Reset(rd io.Reader) {
@@ -90,8 +90,8 @@ func (r *Reader) ReadLine() ([]byte, error) {
 		return nil, fmt.Errorf("redis: reply is empty")
 	}
 	//
-	r.rawbuf = append(r.rawbuf,  line...)
-	r.rawbuf = append(r.rawbuf, '\r','\n')
+	r.rawbuf = append(r.rawbuf, line...)
+	r.rawbuf = append(r.rawbuf, '\r', '\n')
 	if isNilReply(line) {
 		return nil, Nil
 	}
@@ -348,7 +348,7 @@ func parseArrayLen(line []byte) (int64, error) {
 }
 
 /** below is requst parser*/
-func (r *Reader) ReadReq() ([]interface{}, error) {
+func (r *Reader) ReadReq() ([]string, error) {
 	line, err := r.ReadLine()
 	if err != nil {
 		return nil, err
@@ -365,34 +365,34 @@ func (r *Reader) ReadReq() ([]interface{}, error) {
 	}
 }
 
-func (r *Reader) ReadReqInline(line []byte) ([]interface{}, error) {
+func (r *Reader) ReadReqInline(line []byte) ([]string, error) {
 	var tmp = make([]byte, len(line))
 	copy(tmp, line)
-	var ret []interface{}
+	var ret []string
 	var sliced = bytes.Split(tmp, []byte{' '})
 
 	for _, sub := range sliced {
-		//ret = append(ret, string(sub))
-		ret = append(ret, sub)
+		ret = append(ret, string(sub))
+
 	}
 	return ret, nil
 }
 
-func (r *Reader) ReadReqMultiBulk(argLen int64) ([]interface{}, error) {
+func (r *Reader) ReadReqMultiBulk(argLen int64) ([]string, error) {
 	if argLen <= 0 {
 		return nil, fmt.Errorf("redis: read req arg len zero")
 	}
 
 	var i int64
-	var ret []interface{}
+	var ret []string
 	for i = 0; i < argLen; i++ {
 		item, err := r.ReadReqArg()
 		if err != nil {
 			return nil, err
 		}
-		//ret = append(ret, string(item))
-		ret = append(ret, item)
+		ret = append(ret, string(item))
 	}
+
 	return ret, nil
 }
 

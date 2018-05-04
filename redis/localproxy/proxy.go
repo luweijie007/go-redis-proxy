@@ -68,7 +68,8 @@ func (p *Proxy) acceptConn() (net.Conn, error) {
 
 func (p *Proxy) initRedisCluster() error {
 	p.rc = redis.NewClusterClient(&redis.ClusterOptions{
-		Addrs: p.cf.RedisAddrs,
+		Addrs:    p.cf.RedisAddrs,
+		PoolSize: p.cf.NodeConNum,
 	})
 	if rs := p.rc.Ping(); rs.Err() != nil {
 		log.Printf("proxy initRedisCluster failed\n")
@@ -97,7 +98,7 @@ func (p *Proxy) Start() error {
 			if s, err := NewSession(conn, p.rc, p.cf); err != nil {
 				log.Printf("proxy NewSession failed %s\n", err.Error())
 			} else {
-				s.Start(p.exit.C)
+				go s.Start(p.exit.C)
 			}
 		}
 	}()

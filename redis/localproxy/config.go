@@ -7,7 +7,7 @@ import (
 
 type Config struct {
 	ProxyAddr    string   `json:"proxyAddr"`
-	WorkNumber   int      `json:"workNumber"`
+	NodeConNum   int      `json:"NodeConNum"`
 	ReadTimeout  int      `json:"ReadTimeout"`
 	WriteTimeout int      `json:"WriteTimeout"`
 	RedisAddrs   []string `json:"RedisAddrs"`

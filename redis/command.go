@@ -3,16 +3,14 @@ package redis
 import (
 	"bytes"
 	"fmt"
-	"log"
-	"reflect"
-	"strconv"
-	"strings"
-	"time"
-
 	"github.com/go-redis/redis/internal"
 	"github.com/go-redis/redis/internal/pool"
 	"github.com/go-redis/redis/internal/proto"
 	"github.com/go-redis/redis/internal/util"
+	"log"
+	"strconv"
+	"strings"
+	"time"
 )
 
 type Cmder interface {
@@ -124,12 +122,16 @@ func (cmd *baseCmd) stringArg(pos int) string {
 	if pos < 0 || pos >= len(cmd._args) {
 		return ""
 	}
-	s, ok := cmd._args[pos].(string)
-	if !ok {
-		log.Printf(" p:%p 124 err t:%s", cmd, reflect.TypeOf(cmd._args[pos]).String())
+
+	switch t := cmd._args[pos].(type) {
+	case string:
+		return t
+	case []byte:
+		return string(t)
+	default:
+		log.Printf("unexpected type %T", t)
 		return ""
 	}
-	return s
 }
 
 func (cmd *baseCmd) Name() string {
@@ -156,7 +158,7 @@ func (cmd *baseCmd) setErr(e error) {
 }
 
 func (cmd *baseCmd) GetResbuf() []byte {
-	return cmd.resbuf
+	return cmd.resbuf[0:len(cmd.resbuf)]
 }
 
 func (cmd *baseCmd) SetResbuf(buf []byte) {
@@ -203,6 +205,7 @@ func (cmd *Cmd) readReply(cn *pool.Conn) error {
 		// Bytes must be copied, because underlying memory is reused.
 		cmd.val = string(b)
 	}
+	cmd.SetResbuf(cn.Rd.GetResBuf())
 	return nil
 }
 
@@ -251,7 +254,6 @@ type StatusCmd struct {
 
 	val string
 }
-
 
 var _ Cmder = (*StatusCmd)(nil)
 

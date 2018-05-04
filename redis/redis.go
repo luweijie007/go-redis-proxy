@@ -162,9 +162,6 @@ func (c *baseClient) defaultProcess(cmd Cmder) error {
 		if err != nil && internal.IsRetryableError(err, cmd.readTimeout() == nil) {
 			continue
 		}
-		cmd.SetResbuf(cn.Rd.GetResBuf())
-		cn.Rd.ResetRawbuf()
-		log.Println("xxxxxxxxxxxxx 170 %s", cmd.GetResbuf())
 		return err
 	}
 	return cmd.Err()
