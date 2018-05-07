@@ -366,6 +366,7 @@ func (r *Reader) ReadReq() ([]string, error) {
 }
 
 func (r *Reader) ReadReqInline(line []byte) ([]string, error) {
+	return nil, nil
 	var tmp = make([]byte, len(line))
 	copy(tmp, line)
 	var ret []string
@@ -427,4 +428,8 @@ func (r *Reader) HasMore() bool {
 
 func (r *Reader) GetResBuf() []byte {
 	return r.rawbuf
+}
+
+func (r *Reader) Clear() {
+	r.rawbuf = nil
 }

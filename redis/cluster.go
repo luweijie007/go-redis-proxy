@@ -532,6 +532,8 @@ func (c *clusterStateHolder) LazyReload() {
 		_, err := c.Load()
 		if err == nil {
 			time.Sleep(time.Second)
+		}else{
+			log.Printf("LazyReload err %s\n", err.Error())
 		}
 	}()
 }
@@ -822,6 +824,10 @@ func (c *ClusterClient) defaultProcess(cmd Cmder) error {
 		var addr string
 		moved, ask, addr = internal.IsMovedError(err)
 		if moved || ask {
+			cmdInfo := c.cmdInfo(cmd.Name())
+			slot := cmdSlot(cmd, cmdFirstKeyPos(cmd, cmdInfo))
+			log.Printf("825 oldaddr[%s] mov[%t] ask[%t] new_add[%s]  cmd [%s] key [%s] slot [%d]\n",
+				node.Client.getAddr(),moved, ask, addr, cmd.Name(), cmd.stringArg(cmdFirstKeyPos(cmd, cmdInfo)), slot)
 			c.state.LazyReload()
 
 			node, err = c.nodes.GetOrCreate(addr)
@@ -996,7 +1002,6 @@ func (c *ClusterClient) loadState() (*clusterState, error) {
 			}
 			continue
 		}
-
 		slots, err := node.Client.ClusterSlots().Result()
 		if err != nil {
 			if firstErr == nil {
@@ -1004,7 +1009,6 @@ func (c *ClusterClient) loadState() (*clusterState, error) {
 			}
 			continue
 		}
-
 		return newClusterState(c.nodes, slots, node.Client.opt.Addr)
 	}
 
@@ -1206,7 +1210,6 @@ func (c *ClusterClient) TxPipelined(fn func(Pipeliner) error) ([]Cmder, error) {
 }
 
 func (c *ClusterClient) defaultProcessTxPipeline(cmds []Cmder) error {
-	log.Println("defaultProcessTxPipeline 22222222222")
 	state, err := c.state.Get()
 	if err != nil {
 		return err

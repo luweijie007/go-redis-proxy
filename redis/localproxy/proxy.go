@@ -60,7 +60,7 @@ func (p *Proxy) acceptConn() (net.Conn, error) {
 			tcpConn.SetKeepAlivePeriod(time.Second * 2)
 		}
 		conn.SetDeadline(time.Time{})
-		log.Printf("Proxy [%p] acept client Addr [%s]\n", p, conn.RemoteAddr().String())
+		//log.Printf("Proxy [%p] acept client Addr [%s]\n", p, conn.RemoteAddr().String())
 		return conn, err
 	}
 

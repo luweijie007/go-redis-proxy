@@ -56,10 +56,11 @@ func NewSession(con net.Conn,
 }
 
 func (s *Session) Start(cq chan struct{}) {
+	ce := make(chan error, 1)
 	defer func() {
 		s.close()
+		close(ce)
 	}()
-	ce := make(chan error, 1)
 	go func() {
 		select {
 		case <-ce:
@@ -82,10 +83,11 @@ func (s *Session) Start(cq chan struct{}) {
 			//req.buf = [] byte
 			nostart = false
 			if req.argvs, err = s.r.ReadReq(); err != nil {
-				log.Printf("[%p] Session ProcCmds err [%q]\n", s, err)
 				if err == io.EOF { //client close
+					//log.Printf("[%p] Session Stop\n", s)
 					return
 				}
+				log.Printf("[%p] xxxxxxxxxxSession other error %s\n", s, err.Error())
 				continue
 			}
 
@@ -158,6 +160,8 @@ func (s *Session) ProcCmds(reqCmds []*QeqCommandinfo) error {
 
 func (s *Session) close() error {
 	if s.con != nil {
+		s.r.Clear()
+		s.w.Reset(nil)
 		if t, ok := s.con.(*net.TCPConn); ok {
 			return t.Close()
 		}
