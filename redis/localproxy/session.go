@@ -18,7 +18,6 @@ const (
 	TypeInt       RedisProto = ':'
 	TypeBulkBytes RedisProto = '$'
 	TypeArray     RedisProto = '*'
-
 )
 
 type Session struct {
@@ -94,7 +93,7 @@ func (s *Session) Start(cq chan struct{}) {
 			reqs = append(reqs, req)
 		}
 		if len(reqs) > 0 {
-			if s.ProcCmds(reqs); err != nil {
+			if err = s.ProcCmds(reqs); err != nil {
 				log.Printf("[%p] Session ProcCmds err [%q]\n", s, err)
 				continue
 			}
