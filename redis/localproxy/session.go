@@ -86,7 +86,7 @@ func (s *Session) Start(cq chan struct{}) {
 					//log.Printf("[%p] Session Stop\n", s)
 					return
 				}
-				log.Printf("[%p] xxxxxxxxxxSession other error %s\n", s, err.Error())
+				log.Printf("[%p] Session other error %s\n", s, err.Error())
 				continue
 			}
 

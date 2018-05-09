@@ -6,11 +6,13 @@ import (
 )
 
 type Config struct {
-	ProxyAddr    string   `json:"proxyAddr"`
-	NodeConNum   int      `json:"NodeConNum"`
-	ReadTimeout  int      `json:"ReadTimeout"`
-	WriteTimeout int      `json:"WriteTimeout"`
-	RedisAddrs   []string `json:"RedisAddrs"`
+	Net            string   `json:"Net"`
+	ProxyAddr      string   `json:"ProxyAddr"`
+	NodeConNum     int      `json:"NodeConNum"`
+	ReadTimeout    int      `json:"ReadTimeout"`
+	WriteTimeout   int      `json:"WriteTimeout"`
+	RegetStateSpan int      `json:"RegetStateSpan"`
+	RedisAddrs     []string `json:"RedisAddrs"`
 }
 
 func (self *Config) Load(filename string) error {

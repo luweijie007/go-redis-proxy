@@ -32,7 +32,7 @@ func (p *Proxy) Close() {
 
 func (p *Proxy) Setup() error {
 	var err error
-	if p.l, err = net.Listen("tcp4", p.cf.ProxyAddr); err != nil {
+	if p.l, err = net.Listen(p.cf.Net, p.cf.ProxyAddr); err != nil {
 		log.Fatalf("Listen err addr [%s] err [%s]\n",
 			p.cf.ProxyAddr, err.Error())
 		return err
